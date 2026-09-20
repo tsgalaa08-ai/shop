@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/categories', [ShopController::class, 'categories']);
 Route::get('/products', [ShopController::class, 'products']);
 Route::get('/products/{slug}', [ShopController::class, 'product']);
+Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/orders/{number}', [ShopController::class, 'showOrder']);
 Route::post('/orders', [ShopController::class, 'order'])->middleware('throttle:30,1');
 Route::post('/qpay/create', [ShopController::class, 'createQpay']);
@@ -15,6 +16,10 @@ Route::post('/auth/login', [AuthController::class, 'login'])->middleware('thrott
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::prefix('admin')->group(function () {
+        Route::get('/categories', [ShopController::class, 'adminCategories']);
+        Route::post('/categories', [ShopController::class, 'saveCategory']);
+        Route::put('/categories/{category}', [ShopController::class, 'saveCategory']);
+        Route::delete('/categories/{category}', [ShopController::class, 'deleteCategory']);
         Route::get('/products', [ShopController::class, 'adminProducts']);
         Route::post('/products', [ShopController::class, 'saveProduct']);
         Route::put('/products/{product}', [ShopController::class, 'saveProduct']);

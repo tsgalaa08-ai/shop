@@ -1,0 +1,11 @@
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { addToCart, api, money, Product } from "../../../lib/shop";
+
+export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const [product, setProduct] = useState<Product | null>(null); const [quantity, setQuantity] = useState(1); const [message, setMessage] = useState("");
+  useEffect(() => { params.then(({ slug }) => fetch(`${api}/products/${slug}`).then((response) => response.json()).then((result) => setProduct(result.data))); }, [params]);
+  if (!product) return <main className="detail-page"><p className="notice">Бүтээгдэхүүн ачаалж байна...</p></main>;
+  return <main className="detail-page"><header className="site-header"><Link className="brand" href="/">ЖИЖИГ<span>SHOP</span></Link><Link className="cart" href="/checkout">Сагс руу очих →</Link></header><div className="detail"><div className="detail-image">{product.image ? <div className="product-photo" style={{ backgroundImage: `url(${product.image})` }} /> : "✦"}</div><div className="detail-copy"><p className="eyebrow">{product.category?.name} · {product.sku}</p><h1>{product.name}</h1><p className="detail-price">{money(product.sale_price ?? product.price)} {product.sale_price && <del>{money(product.price)}</del>}</p><p className="description">{product.description || "Өдөр тутмын хэрэглээнд тохиромжтой чанартай бүтээгдэхүүн."}</p><p className="stock">{product.stock > 0 ? `${product.stock} ширхэг үлдсэн` : "Дууссан"}</p><div className="quantity"><button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button><strong>{quantity}</strong><button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}>+</button></div><button className="primary" disabled={!product.stock} onClick={() => { addToCart(product, quantity); setMessage("Сагсанд нэмэгдлээ"); }}>Сагсанд нэмэх</button>{message && <p className="success">{message} · <Link href="/checkout">Checkout руу очих</Link></p>}</div></div></main>;
+}
